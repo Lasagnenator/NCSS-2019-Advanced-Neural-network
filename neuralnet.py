@@ -21,6 +21,10 @@ class Node():
         #doesn't matter which one we take the length from
         number_connected = len(parents)
 
+        #and now we just set the node properties to be saved
+        self.parents = parents
+        self.weights = weights
+
     #calculates the weighted sum of this node
     def evaluate(self) -> int:
         value = 0
@@ -41,13 +45,9 @@ def saveState(nodes:list):
     with open("./NeuralNet.SaveState", "wb") as f:
         pickle.dump(nodes, f)
 
-def loadState(nodes:list):
-    #nodes should be a length of zero or this won't work
-    if len(nodes)!=0:
-        raise ValueError("nodes must be length zero prior to loading")
-    
+def loadState():
     with open("./NeuralNet.SaveState", "rb") as f:
-        temp = pickle.load(f)
-
-    for item in temp:
-        nodes.append(item)
+        nodes = pickle.load(f)
+    
+    #now we return the nodes after leaving the with block
+    return nodes
