@@ -1,0 +1,48 @@
+DEADLINE 2019-09-01 21:00
+
+Max 2 seconds per play
+play function is called
+signature:
+	hand: 
+		List of cards in your hand
+
+	is_start_of_round:
+		Asked for the first play of the round
+
+	play_to_beat:
+		List of card strings showing the current best play
+		Can be empty if first to play
+
+	round_history:
+		A List of 2-tuples which are (player_no, play)
+		where player_no is the player number 0-3 and play
+		is the list of card strings that were played
+
+	player_no:
+		Integer 0-3 denoting which player number you are
+
+	hand_sizes:
+		4-Tuple of numbers of cards in each player's hand
+		from player 0 to 3
+
+	scores:
+		4-Tuple of hte current scores of each player from
+		player 0-3
+
+	round_no:
+		Integer 0-9 indicating which round it is
+
+	RETURN:
+		List of the cards to be played
+		A pass is made by returning an empty list
+
+
+if play function errors by invalid move, error or time limit, match
+ends immediately with no update to the leaderboard.
+
+If errors out 10 times in the tournament, it is removed
+Can have 3 bots at a time
+Unlimited submitions
+
+
+WEEK 1, only 1-card plays
