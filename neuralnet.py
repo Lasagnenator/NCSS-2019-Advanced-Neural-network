@@ -85,7 +85,23 @@ class Node():
 #This will be the class that contains many Node classes
 #It can also play the game
 class Individual():
-    def __init__(self):
+    inputNodes = []
+    outputNodes = []
+    outputNodesWeight = []
+
+    #This is a multidimensional list
+    #nodeLayers[0][1] implies first layer and second node in the layer
+    #same for nodeLayersWeights
+    nodeLayers = []
+    nodeLayersWeights = []
+    
+    #Creates a network with a square shaped hidden layers
+    #Every node is connected to every node in the previous layer
+    #If it is the starting node, it doens't matter
+    #Number of output nodes can be changed so that we can have
+    # specific number of outputs
+    def __init__(self, numInputs:int, numLayers:int, nodesPerLayer:int,
+                 numOutputs:int):
         pass
 
 def saveState(individuals:list):
