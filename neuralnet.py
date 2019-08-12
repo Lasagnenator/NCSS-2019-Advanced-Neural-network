@@ -25,7 +25,7 @@ be the win percentage. If loses are zero just double the points.
 At the end of a generation the parents are the top 50% and the
 the next generation consists of the parents as well as the
 children to fill up the last 50% to keep a constant number of
-bots.
+bots. Parents are rank 1&2 then 3&4 etc
 
 I expect there to be not many neural networks playing as this
 concept is hard and usually only done with the help of external
@@ -37,80 +37,26 @@ running at a time for each rule set. I will copy this file to
 a new folder for each rule set.
 """
 
+from Classes import Network
 
-#we use pickle to make a 'save-state' of the net so we can come back to it
-#this is only going to be used during training
-import pickle
+import random
+#set seed for reproducability
+#we only want to test the network not the random number we have
+random.seed(2)
 
-#this represents a node in the network
-class Node():
+def randomiseWeights(a, b, network):
+    """a is low number and b is high number"""
+    network.randomiseWeights(lambda: random.uniform(a,b))
 
-    #class properties
-    parents = []
-    weights = []
-    number_conencted = 0
-    value = 0
-    
-    #initialises the class with optional connected parent nodes
-    def __init__(self, parents=None, weights=None):
-        #basic error checking
-        if parents==None or weights==None:
-            return self
-        if len(parents)!=len(weights):
-            raise ValueError("lengths of lists were not equal")
-        
-        #doesn't matter which one we take the length from
-        number_connected = len(parents)
-
-        #and now we just set the node properties to be saved
-        self.parents = parents
-        self.weights = weights
-
-    #calculates the weighted sum of this node
-    def evaluate(self) -> int:
-        value = 0
-        
-        for i in range(number_connected):
-            #This is the definition of the weighted sum
-            value += parents[i].value * weights[i]
-
-        self.value = value
-        return value
-
-    def setValue(self, value:int):
-        if not isinstance(value, int):
-            raise TypeError("value must be of type int")
-        self.value = value
-
-#This will be the class that contains many Node classes
-#It can also play the game
-class Individual():
-    inputNodes = []
-    outputNodes = []
-    outputNodesWeight = []
-
-    #This is a multidimensional list
-    #nodeLayers[0][1] implies first layer and second node in the layer
-    #same for nodeLayersWeights
-    nodeLayers = []
-    nodeLayersWeights = []
-    
-    #Creates a network with a square shaped hidden layers
-    #Every node is connected to every node in the previous layer
-    #If it is the starting node, it doens't matter
-    #Number of output nodes can be changed so that we can have
-    # specific number of outputs
-    def __init__(self, numInputs:int, numLayers:int, nodesPerLayer:int,
-                 numOutputs:int):
-        pass
-
-def saveState(individuals:list):
-    with open("./NeuralNet.SaveState", "wb") as f:
+def saveState(networks:list, fname:str):
+    import pickle
+    with open(fname, "wb") as f:
         pickle.dump(nodes, f)
 
-def loadState():
-    with open("./NeuralNet.SaveState", "rb") as f:
-        individuals = pickle.load(f)
+def loadState(fname:str):
+    import pickle
+    with open(fname, "rb") as f:
+        networks = pickle.load(f)
     
-    #now we return the nodes after leaving the with block
-    return individuals
+    #now we return the networks after leaving the with block
+    return networks
