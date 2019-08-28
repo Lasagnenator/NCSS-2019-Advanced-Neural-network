@@ -1,6 +1,6 @@
 from neuralnet import *
 
-n = Network(3, 3, 4)
+n = Network(100, 100, 100)
 randomiseWeights(-1,1,n)
-n.setInputs([1,2,3])
+n.setInputs([1,1,1])
 n.evaluate()
