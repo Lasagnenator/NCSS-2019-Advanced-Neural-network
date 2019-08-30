@@ -25,7 +25,7 @@ def play(hand, is_start_of_round, play_to_beat, round_history, player_no, hand_s
         in_list[break_card(card)] = 1
     for card in play_to_beat:
         in_list[break_card(card)+52] = 1
-    in_list[-1] = int(is_start_of_round)
+    in_list[103] = int(is_start_of_round)
         
     #list has been chosen
     net.setInputs(in_list)
