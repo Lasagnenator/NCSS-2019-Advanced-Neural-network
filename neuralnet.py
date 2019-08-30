@@ -40,9 +40,6 @@ a new folder for each rule set.
 from Classes import Network
 
 import random
-#set seed for reproducability
-#we only want to test the network not the random number we have
-random.seed(2)
 
 def randomiseWeights(a, b, network):
     """a is low number and b is high number"""

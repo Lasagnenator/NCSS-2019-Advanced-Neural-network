@@ -8,8 +8,6 @@ def order(networks):
 
 def children(parent1, parent2):
     #gives both children of the parents as network objects
-    #set the seed. After testing it will become random
-    random.seed(2)
     #chromosomes are layers of weights
 
     inputSize = len(parent1.Matrix[0])

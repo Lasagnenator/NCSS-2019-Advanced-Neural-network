@@ -10,6 +10,8 @@ class Node():
         self.value = 0
         for i, input in enumerate(inputNodes):
             self.value += input.value*self.weights[i]
+        sign = lambda x: int(x>0)
+        self.value = sign(self.value)
         return self.value
 
     def setValue(self, value):
