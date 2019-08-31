@@ -12,10 +12,12 @@ _deck.extend("3H 4S 6H 6S 7H 7S 8D 9H JH QD KD AC AS".split(" "))
 #print("p3 hand", p3_hand)
 #print("p4 hand", p4_hand)
 
-def start_game2(p0_play, p1_play, p2_play, p3_play):
+def start_game(p0_play, p1_play, p2_play, p3_play):
 
     old_stdout = sys.stdout
     sys.stdout = open("out.txt", "w")
+
+    round_history = []
 
     for round_number in range(10): #10 rounds
         print("--------------------")
@@ -55,15 +57,18 @@ def start_game2(p0_play, p1_play, p2_play, p3_play):
             current_player = 3
             print("Player 3 had 3D")
 
+        round_end = False
         #start the round now
-        while players[0][0] and players[1][0] and players[2][0] and players[3][0]:
+        while not round_end:
             for trick_num in range(13):
                 print("Starting trick", trick_num)
 
-                do_trick(players, current_player)
-                
+                current_player, round_end = do_trick(players, current_player, round_number)
+                if round_end:
+                    break
             update_scores(players)
-                    
+
+    print([players[[0,1,2,3].index(x)][2] for x in range(4)])
     key = lambda x:players[[0,1,2,3].index(x)][2]
     ranks = sorted([0,1,2,3], key=key, reverse=True)
     print("**************")
@@ -71,13 +76,52 @@ def start_game2(p0_play, p1_play, p2_play, p3_play):
     sys.stdout.close()
     sys.stdout = old_stdout
 
-def do_trick(players, current_player):
+def do_trick(players, current_player, round_number):
     previous_play = []
+    failures = [0,0,0,0]
+    passes = [0,0,0,0]
+    round_end = False
     #using i because it is just for repetition
     for i in range(52): #maximum plays in a trick
+        play = players[current_player][1](players[current_player][0],
+                                          round_number==0,
+                                          previous_play,
+                                          None,
+                                          current_player,
+                                          [len(players[0][0]), len(players[1][0]), len(players[2][0]), len(players[3][0])],
+                                          [players[0][2], players[1][2], players[2][2], players[3][2]],
+                                          round_number)
+        validity = play_check.is_valid_play(previous_play, play)
+        print("Player",current_player,"played",play)
+        print("Valid:",validity)
+        if not validity:
+            players[current_player][2] -= 50
+            failures[current_player] = 1
+        else:
+            if play==[]:#pass
+                passes[current_player] = 1
+        if passes.count(1)==3:
+            round_end = True
+            break
+        if all(failures):
+            print("All players failed to play a valid play. Ending round.")
+            round_end = True
+            break
+        current_player += 1
+        if current_player>3:
+            current_player = 0
         
+    return current_player, round_end
 
 def update_scores(players):
+    total_cards = 0
+    hands = [0,0,0,0]
+    for i,player in enumerate(players):
+        players[i][2] += play_check.len_to_score(len(players[i][0]))
+        hands[i] = len(players[i][0])
+        total_cards += len(players[i][0])
+    winner = hands.index(min(hands))
+    players[winner][2] = total_cards
     
 
 if __name__=="__main__":
@@ -85,4 +129,4 @@ if __name__=="__main__":
     import program as p2
     import program as p3
     import program as p4
-    start_game2(p1.play, p2.play, p3.play, p4.play)
+    start_game(p1.play, p2.play, p3.play, p4.play)

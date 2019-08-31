@@ -35,4 +35,6 @@ def play(hand, is_start_of_round, play_to_beat, round_history, player_no, hand_s
     for i, val in enumerate(out,start=0):
         if val==1 and in_list[i]==1:
             play.append(join_card(i))
+    if len(play_to_beat)!=0:
+        play = play[:len(play_to_beat)]
     return play

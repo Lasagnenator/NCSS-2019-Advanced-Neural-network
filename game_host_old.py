@@ -1,3 +1,12 @@
+import random
+import play_check
+import sys
+
+_deck = "5C 6D 6C 7D 7C 8C 8S 9C 0C QC QH KC 2H".split(" ")
+_deck.extend("3C 4D 4C 5H 9D 9S 0H JD JS KH KS AD 2D".split(" "))
+_deck.extend("3D 3S 4H 5D 5S 8H 0D 0S JC QS AH 2C 2S".split(" "))
+_deck.extend("3H 4S 6H 6S 7H 7S 8D 9H JH QD KD AC AS".split(" "))
+
 def start_game(p0_play, p1_play, p2_play, p3_play):
     #args are play functions for each player
 
@@ -106,3 +115,10 @@ def start_game(p0_play, p1_play, p2_play, p3_play):
     sys.stdout.close()
     sys.stdout = old_stdout
     return ranks
+
+if __name__=="__main__":
+    import program as p1
+    import program as p2
+    import program as p3
+    import program as p4
+    start_game(p1.play, p2.play, p3.play, p4.play)
