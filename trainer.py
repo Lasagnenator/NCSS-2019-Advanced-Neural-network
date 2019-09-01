@@ -53,7 +53,7 @@ def main():
         
     #print(temp)
     
-    print("All bots have played a game")
+    print("All bots have made a play")
     print("Saving for contingency")
     saveState(population, "saveState.dat")
     print("Saved")
@@ -88,16 +88,16 @@ def main():
     saveState(new_population, "saveState.dat")
     print("Saved new population")
 
-def run_games(subset, thread_number, fitnesses):
+def run_games(subset, proc_number, fitnesses):
     for i in range(0,len(subset),4):
         p1, p2, p3, p4 = subset[i:i+4]
-        fname = "threads/thread{}-{}.txt".format(thread_number, i)
+        fname = "proc/proc{}-{}.txt".format(proc_number, i)
         f = open(fname, "w+")
         scores= game_host.start_game(p1.play, p2.play, p3.play, p4.play, f)
-        fitnesses[thread_number*len(subset)+i]=scores[0]
-        fitnesses[thread_number*len(subset)+i+1]=scores[1]
-        fitnesses[thread_number*len(subset)+i+2]=scores[2]
-        fitnesses[thread_number*len(subset)+i+3]=scores[3]
+        fitnesses[proc_number*len(subset)+i]=scores[0]
+        fitnesses[proc_number*len(subset)+i+1]=scores[1]
+        fitnesses[proc_number*len(subset)+i+2]=scores[2]
+        fitnesses[proc_number*len(subset)+i+3]=scores[3]
         f.close()
 
 def new_player():
