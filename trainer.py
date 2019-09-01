@@ -12,14 +12,11 @@ survivors_per_generation = 80 #top performing
 wildcard_survivors = 20
 random_per_generation = 100
 
-max_games_per_thread = 10 #remember 4 players per game
+max_games_per_thread = 20 #remember 4 players per game
 
 survivors_total = survivors_per_generation+wildcard_survivors
 
-fitnesses = [0]*population_size
-
 def main():
-    global fitnesses
     if os.path.exists("saveState.dat"):
         print("Found previous population data")
         population = loadState("saveState.dat")
@@ -27,8 +24,9 @@ def main():
     else:
         print("Did not find previous population, starting from nothing")
         population = create_population()
-    fitnesses = [0]*population_size
-    f_arr = mp.Array("i", range(population_size))
+        
+    f_arr = mp.Array("i", [0]*population_size)
+    
     p = []
     p_id = 0
     print("Starting games")
@@ -40,10 +38,13 @@ def main():
     print(p_id+1, "processes running")
     for proc in p:
         proc.join()
-
+        
+    temp = []
     for i, value in enumerate(f_arr):
         population[i].fitness = value
-    #print(fitnesses)
+        temp.append(value)
+        
+    #print(temp)
     
     print("All bots have played a game")
     print("Saving for contingency")
@@ -90,7 +91,7 @@ def run_games(subset, thread_number, fitnesses):
         fitnesses[thread_number*len(subset)+i+1]=scores[1]
         fitnesses[thread_number*len(subset)+i+2]=scores[2]
         fitnesses[thread_number*len(subset)+i+3]=scores[3]
-        subset[i].fitness, subset[i+1].fitness, subset[i+2].fitness, subset[i+3].fitness = scores
+        f.close()
 
 def new_player():
     return program.Player()
