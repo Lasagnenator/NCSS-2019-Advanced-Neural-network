@@ -10,9 +10,9 @@ import program
 population_size = 1000
 survivors_per_generation = 80 #top performing
 wildcard_survivors = 20
-random_per_generation = 100
+random_per_generation = 200
 
-max_games_per_thread = 20 #remember 4 players per game
+max_games_per_thread = 25 #remember 4 players per game
 
 survivors_total = survivors_per_generation+wildcard_survivors
 
@@ -35,14 +35,20 @@ def main():
         p.append(mp.Process(target = run_games, args=[subset, p_id, f_arr]))
         p[-1].start()
         p_id += 1
-    print(p_id+1, "processes running")
+    print(p_id, "processes running")
     for proc in p:
         proc.join()
         
     temp = []
+    mvp = []
     for i, value in enumerate(f_arr):
         population[i].fitness = value
         temp.append(value)
+        if value>26:
+            mvp.append(population[i])
+            print("MVP is", i, "with", population[i].fitness)
+    if mvp != []:
+        saveState(mvp, "MVP.dat")
         
     #print(temp)
     
@@ -53,7 +59,7 @@ def main():
     print("---------------")
     print("Begin evolution")
     population = genetic.order(population)
-    print("Highest score in this generation:", population[0].fitness)
+    print("Highest score in this generation:", population[0].fitness, "(pid {})".format(temp.index(population[0].fitness)))
     new_population = []
     #pool to produce offspring
     pool = population[:survivors_per_generation]

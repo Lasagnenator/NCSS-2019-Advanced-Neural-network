@@ -2,6 +2,8 @@
 
 from neuralnet import *
 
+mutation_rate = 0.001
+
 def order(networks):
     #sort the networks by fitness
     return sorted(networks, reverse=True, key=lambda x:x.fitness)
@@ -24,11 +26,27 @@ def children(parent1, parent2):
     ###Child1
     w1 = parent1.weights[:cross]
     w1.extend(parent2.weights[cross:])
+    #mutations
+    for i,layer in enumerate(w1):
+        for j,node in enumerate(layer):
+            for k,weight in enumerate(node):
+                if random.choices([True, False], [mutation_rate, 100-mutation_rate], k=1)[0]:
+                    w1[i][j][k] = random.uniform(-1,1)
+                    #print("Mutation happened")
+                
     child1.setWeights(w1)
 
     ###Child2
     w2 = parent2.weights[:cross]
     w2.extend(parent1.weights[cross:])
+    #mutations
+    for i,layer in enumerate(w2):
+        for j,node in enumerate(layer):
+            for k,weight in enumerate(node):
+                if random.choices([True, False], [mutation_rate, 100-mutation_rate], k=1)[0]:
+                    w2[i][j][k] = random.uniform(-1,1)
+                    #print("Mutation happened")
+    
     child2.setWeights(w2)
 
     return [child1, child2]

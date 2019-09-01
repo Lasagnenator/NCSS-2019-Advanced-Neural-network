@@ -56,26 +56,25 @@ def start_game(p0_play, p1_play, p2_play, p3_play, f=open("out.txt", "w+")):
 
         round_end = False
         #start the round now
-        while not round_end:
-            for trick_num in range(13):
-                print("Starting trick", trick_num, file=f)
-                print("Player 0:",p0_hand, file=f)
-                print("Player 1:",p1_hand, file=f)
-                print("Player 2:",p2_hand, file=f)
-                print("Player 3:",p3_hand, file=f)
+        for trick_num in range(13):
+            print("Starting trick", trick_num, file=f)
+            print("Player 0:",p0_hand, file=f)
+            print("Player 1:",p1_hand, file=f)
+            print("Player 2:",p2_hand, file=f)
+            print("Player 3:",p3_hand, file=f)
 
-                current_player, round_end = do_trick(players, current_player, trick_num, f)
-                if round_end:
-                    break
-            update_scores(players, f)
-            
-            f.flush()
+            current_player, round_end = do_trick(players, current_player, trick_num, f)
+            if round_end:
+                break
+        update_scores(players, f)
+        
+        f.flush()
 
     key = lambda x:players[[0,1,2,3].index(x)][2]
     ranks = sorted([0,1,2,3], key=key, reverse=True)
     print("**************", file=f)
     print(ranks, file=f)
-    f.close()
+    f.flush()
     #return scores
     return [players[i][2] for i in range(4)]
 
@@ -87,6 +86,9 @@ def do_trick(players, current_player, trick_num, f):
     last_not_pass = current_player
     #using i because it is just for repetition
     for i in range(52): #maximum plays in a trick
+        if failures[current_player]==1:
+            players[current_player][2] -= 50
+            continue
         play = players[current_player][1](players[current_player][0],
                                           trick_num==0 and i==0,
                                           previous_play,
@@ -104,19 +106,21 @@ def do_trick(players, current_player, trick_num, f):
         else:
             if play==[]:#pass
                 passes[current_player] = 1
+                players[current_player][2] -=10
             else:
                 passes[current_player] = 0
                 previous_play = play
                 
                 [players[current_player][0].remove(card) for card in play]
                 last_not_pass = current_player
+                players[current_player][2] += 100
         if passes.count(1)==3:
             #round_end = True
             print("All other players passed, trick ended", file=f)
             current_player = last_not_pass
             break
-        if failures.count(1)==3:
-            print("All players failed to play a valid play. Ending round.", file=f)
+        if failures.count(1)==4:
+            print("Failure occured in all 4 players. Ending round.", file=f)
             round_end = True
             break
         if len(players[current_player][0])==0:
@@ -139,11 +143,4 @@ def update_scores(players, f):
     winner = hands.index(min(hands))
     players[winner][2] += total_cards
     [print("Player", i, "score:", players[i][2], file=f) for i in range(4)]
-    
 
-if __name__=="__main__":
-    import program as p1
-    import program as p2
-    import program as p3
-    import program as p4
-    start_game(p1.play, p2.play, p3.play, p4.play)

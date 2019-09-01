@@ -14,19 +14,19 @@ class Player():
     def __init__(self):
 #105 inputs: 52 hand, 52 for play to beat, 1 for is_start_of_round
 #52 outputs: cards to play
-#10x10 hidden layers
-        self.net = Network(52*2+1, 52, 20)
+#6x6 hidden layers
+        self.net = Network(52*2+1, 52, 6)
         
         #CHANGE AND FIX WEIGHTS
         self.net.randomiseWeights(lambda:random.uniform(-1,1))
         
     def play(self, hand, is_start_of_round, play_to_beat, round_history, player_no, hand_sizes, scores, round_no):
-        in_list = [0]*104
+        in_list = [0]*105
         for card in hand:
             in_list[break_card(card)] = 1
         for card in play_to_beat:
             in_list[break_card(card)+52] = 1
-        in_list[103] = int(is_start_of_round)
+        in_list[104] = int(is_start_of_round)
             
         #list has been chosen
         self.net.setInputs(in_list)
