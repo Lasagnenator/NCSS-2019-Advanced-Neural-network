@@ -84,7 +84,6 @@ def main():
     for player in pool:
         new_population.append(player)
     print("New population generated with length:", len(new_population))
-    print("---------------")
     saveState(new_population, "saveState.dat")
     print("Saved new population")
 
@@ -123,14 +122,14 @@ def loadState(fname:str):
 
 def TRAIN():
     try:
-        generation = 0
+        generation = 57
         while True:
             print("-----------------------")
             print("Generation", generation)
-            files = glob.glob("./threads/*")
+            files = glob.glob("./proc/*")
             for file in files:
                 os.remove(file)
-            print("Cleared threads folder\n")
+            print("Cleared proc folder\n")
             main()
             generation += 1
             print()
