@@ -1,4 +1,4 @@
-import threading
+import multiprocessing as mp
 import genetic
 import sys
 import os
@@ -12,11 +12,14 @@ survivors_per_generation = 80 #top performing
 wildcard_survivors = 20
 random_per_generation = 100
 
-max_games_per_thread = 25 #remember 4 players per game
+max_games_per_thread = 10 #remember 4 players per game
 
 survivors_total = survivors_per_generation+wildcard_survivors
 
+fitnesses = [0]*population_size
+
 def main():
+    global fitnesses
     if os.path.exists("saveState.dat"):
         print("Found previous population data")
         population = loadState("saveState.dat")
@@ -24,20 +27,24 @@ def main():
     else:
         print("Did not find previous population, starting from nothing")
         population = create_population()
-    
-    t = []
-    thread_id = 1
+    fitnesses = [0]*population_size
+    f_arr = mp.Array("i", range(population_size))
+    p = []
+    p_id = 0
     print("Starting games")
-    temp_pop = []
     for i in range(0,population_size, max_games_per_thread*4):
         subset = population[i:i+(max_games_per_thread*4)]
-        t.append(threading.Thread(target = run_games, args=[subset, thread_id]))
-        t[-1].start()
-        thread_id += 1
-        temp_pop.extend(subset)
-    for th in t:
-        th.join()
-    population = temp_pop
+        p.append(mp.Process(target = run_games, args=[subset, p_id, f_arr]))
+        p[-1].start()
+        p_id += 1
+    print(p_id+1, "processes running")
+    for proc in p:
+        proc.join()
+
+    for i, value in enumerate(f_arr):
+        population[i].fitness = value
+    #print(fitnesses)
+    
     print("All bots have played a game")
     print("Saving for contingency")
     saveState(population, "saveState.dat")
@@ -45,7 +52,7 @@ def main():
     print("---------------")
     print("Begin evolution")
     population = genetic.order(population)
-    print("Highest score in this generation:", population[0].net.fitness)
+    print("Highest score in this generation:", population[0].fitness)
     new_population = []
     #pool to produce offspring
     pool = population[:survivors_per_generation]
@@ -73,12 +80,16 @@ def main():
     saveState(new_population, "saveState.dat")
     print("Saved new population")
 
-def run_games(subset, thread_number):
+def run_games(subset, thread_number, fitnesses):
     for i in range(0,len(subset),4):
         p1, p2, p3, p4 = subset[i:i+4]
         fname = "threads/thread{}-{}.txt".format(thread_number, i)
         f = open(fname, "w+")
         scores= game_host.start_game(p1.play, p2.play, p3.play, p4.play, f)
+        fitnesses[thread_number*len(subset)+i]=scores[0]
+        fitnesses[thread_number*len(subset)+i+1]=scores[1]
+        fitnesses[thread_number*len(subset)+i+2]=scores[2]
+        fitnesses[thread_number*len(subset)+i+3]=scores[3]
         subset[i].fitness, subset[i+1].fitness, subset[i+2].fitness, subset[i+3].fitness = scores
 
 def new_player():
@@ -114,5 +125,9 @@ def TRAIN():
             print("Cleared threads folder\n")
             main()
             generation += 1
+            print()
     except KeyboardInterrupt:
         input("\nPress enter to exit.\n")
+
+if __name__=="__main__":
+    TRAIN()
