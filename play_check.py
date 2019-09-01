@@ -3,16 +3,22 @@ import itertools
 RANK_ORDER = '34567890JQKA2'
 SUIT_ORDER = 'DCHS'
 
-def is_valid_play(previous_play, play):
+def is_valid_play(previous_play, play, is_start_of_round):
+    previous_play = sort_cards(previous_play)
+    play = sort_cards(play)
     if len(play)>5:
         return False
+    if len(play)==4:
+        return False
+
+    if is_start_of_round:
+        if not "3D" in play:
+            return False
     #testing a pass
     if previous_play != [] and play == []: #pass
         return True
     if previous_play == play == []: #pass
         return True
-    if len(play)!=len(previous_play): #must be the same length as the prev
-        return False
     
     ###Check if the combo is allowed
     if len(play)==2: #playing a pair
@@ -20,9 +26,6 @@ def is_valid_play(previous_play, play):
             return False
     elif len(play)==3: #playing a triple
         if not (play[0][0]==play[1][0]==play[2][0]):
-            return False
-    elif len(play)==4: #playing a four of a kind
-        if not (play[0][0]==play[1][0]==play[2][0]==play[3][0]):
             return False
         
     elif len(play)==5: #playing 5 cards
@@ -33,23 +36,28 @@ def is_valid_play(previous_play, play):
             valid = True
         elif is_flush(play): #flush
             valid = True
+        elif is_four(play): #four of a kind
+            valid = True
         if not valid:
             return False
     
 
     ###check different plays
-    if previous_play==[] and "3D" in play:
+    if is_start_of_round and ("3D" in play):
         return True
     if len(previous_play)==len(play)==1: #one card play
         return is_higher(play[0], previous_play[0])
     if len(previous_play)==len(play)==2: #two card play
         return is_higher_pair(play, previous_play)
     if len(previous_play)==len(play)==3: #three card play
-        return
-    if len(previous_play)==len(play)==4: #four card play
-        return
+        return is_higher_triple(play, previous_play)
     if len(previous_play)==len(play)==5: #five card play
-        return
+        return is_higher_five(play, previous_play)
+    if previous_play==[]:
+        return True
+
+    if len(play)!=len(previous_play): #must be the same length as the prev
+        return False
     return False
 
 def len_to_score(length):
@@ -104,6 +112,15 @@ def is_triple(card1, card2, card3):
         return True
     return False
 
+def is_four(play):
+    return (play[0][0]==play[1][0]==play[2][0]==play[3][0]) or (play[1][0]==play[2][0]==play[3][0]==play[4][0])
+
+def is_higher_triple(play, previous_play):
+    return is_higher(play[0], previous_play[0])
+
+def is_higher_four(play, previous_play):
+    return is_higher(play[0], previous_play[0])
+
 def all_pairs(hand):
     out = []
     for pair in itertools.combinations(hand, 2):
@@ -145,3 +162,50 @@ def is_flush(cards):
     if c1_s==c2_s==c3_s==c3_s==c4_s==c5_s:
         return True
     return False
+
+def is_higher_five(play, previous):
+    if is_straight(play) and is_flush(play) and is_straight(previous) and is_flush(previous):
+        #straight flush
+        return is_higher(play[-1], previous[-1])
+    if is_straight(play) and is_flush(play) and (is_straight(previous) or is_flush(previous)):
+        #play is straight flush
+        return True
+    if (is_straight(play) or is_flush(play)) and is_straight(previous) and is_flush(previous):
+        #previous is straight flush
+        return False
+    if is_straight(play) and is_flush(play):
+        #previous is not straight/flush and play is straight flush
+        return True
+    
+    if is_four(play) and is_four(previous):
+        #four of a kinds
+        return is_higher(play[-1], previous[-1])
+    if is_four(play):
+        #previous is not four of a kind or higher
+        return True
+    
+    if is_full_house(play) and is_full_house(previous):
+        #full houses
+        return is_higher(play[-1], previous[-1])
+    if is_full_house(play):
+        #previous is not higher than play
+        return True
+
+    if is_flush(play) and is_flush(previous):
+        #flushes
+        return is_higher(play[-1], previous[-1])
+    if is_flush(play):
+        #previous is not higher than play
+        return True
+    
+    if is_straight(play) and is_straight(previous):
+        #straights
+        return is_higher(play[-1], previous[-1])
+    
+    
+
+def key(card):
+  return SUIT_ORDER.index(card[1]) + RANK_ORDER.index(card[0])*10
+
+def sort_cards(cards):
+  return sorted(cards, key=key)

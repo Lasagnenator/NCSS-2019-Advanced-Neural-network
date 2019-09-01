@@ -44,16 +44,3 @@ import random
 def randomiseWeights(a, b, network):
     """a is low number and b is high number"""
     network.randomiseWeights(lambda: random.uniform(a,b))
-
-def saveState(networks:list, fname:str):
-    import pickle
-    with open(fname, "wb") as f:
-        pickle.dump(nodes, f)
-
-def loadState(fname:str):
-    import pickle
-    with open(fname, "rb") as f:
-        networks = pickle.load(f)
-    
-    #now we return the networks after leaving the with block
-    return networks
