@@ -7,10 +7,10 @@ import game_host
 import random
 import program
 
-population_size = 1000
-survivors_per_generation = 80 #top performing
-wildcard_survivors = 20
-random_per_generation = 200
+population_size = 10000
+survivors_per_generation = 800 #top performing
+wildcard_survivors = 200
+random_per_generation = 2000
 
 max_games_per_thread = 25 #remember 4 players per game
 
@@ -24,6 +24,7 @@ def main():
     else:
         print("Did not find previous population, starting from nothing")
         population = create_population()
+        print("Initialised population with random values")
         
     f_arr = mp.Array("i", [0]*population_size)
     
@@ -35,7 +36,7 @@ def main():
         p.append(mp.Process(target = run_games, args=[subset, p_id, f_arr]))
         p[-1].start()
         p_id += 1
-    print(p_id, "processes running")
+    print(p_id, "processes used")
     for proc in p:
         proc.join()
         

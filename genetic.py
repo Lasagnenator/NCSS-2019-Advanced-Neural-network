@@ -23,6 +23,7 @@ def children(parent1, parent2):
     #should not matter which parent this number is generated from
     cross = random.randint(1, len(parent1.weights))
 
+    mutations = 0
     ###Child1
     w1 = parent1.weights[:cross]
     w1.extend(parent2.weights[cross:])
@@ -32,6 +33,7 @@ def children(parent1, parent2):
             for k,weight in enumerate(node):
                 if random.choices([True, False], [mutation_rate, 100-mutation_rate], k=1)[0]:
                     w1[i][j][k] = random.uniform(-1,1)
+                    mutations += 1
                     #print("Mutation happened")
                 
     child1.setWeights(w1)
@@ -45,10 +47,11 @@ def children(parent1, parent2):
             for k,weight in enumerate(node):
                 if random.choices([True, False], [mutation_rate, 100-mutation_rate], k=1)[0]:
                     w2[i][j][k] = random.uniform(-1,1)
+                    mutations += 1
                     #print("Mutation happened")
     
     child2.setWeights(w2)
-
+    #print(mutations, "mutations happened")
     return [child1, child2]
     
     
